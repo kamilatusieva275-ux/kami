@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Найди одинаковые картинки — Dana Bala</title>
+<style>
+  body {
+    background-color: #fdf6ff;
+    font-family: "Comic Sans MS", sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+  }
+  h2 {
+    color: #7a39ff;
+    font-size: 1.5em;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .card {
+    width: 100px;
+    height: 100px;
+    border-radius: 15px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 45px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #d8c4ff;
+    transition: transform 0.2s;
+  }
+  .card.correct {
+    background-color: #b2f2bb;
+    transform: scale(1.1);
+  }
+  .card.wrong {
+    background-color: #ffc9c9;
+  }
+  #result {
+    font-size: 1.3em;
+    margin-top: 15px;
+    color: #5f3dc4;
+    font-weight: bold;
+  }
+  #restart {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #7b3fff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h2>👀 Найди одинаковые картинки!</h2>
+<div class="grid" id="grid"></div>
+<p id="result"></p>
+<button id="restart">🔁 Играть снова</button>
+
+<script>
+const emojis = ['🍎','🐶','🚗','🍌','🐱','🌸']; 
+let selected = [];
+let matched = [];
+
+function createGame() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = "";
+  document.getElementById("result").innerText = "";
+  document.getElementById("restart").style.display = "none";
+  matched = [];
+  selected = [];
+
+  let items = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+  
+  items.forEach((emoji, index) => {
+    const div = document.createElement('div');
+    div.classList.add('card');
+    div.textContent = emoji;
+    div.dataset.value = emoji;
+    div.addEventListener('click', () => check(div));
+    grid.appendChild(div);
+  });
+}
+
+function check(card) {
+  if (selected.includes(card) || matched.includes(card)) return;
+
+  card.style.transform = "scale(1.1)";
+  selected.push(card);
+
+  if (selected.length === 2) {
+    const [first, second] = selected;
+    if (first.dataset.value === second.dataset.value) {
+      first.classList.add('correct');
+      second.classList.add('correct');
+      matched.push(first, second);
+      selected = [];
+      if (matched.length === document.querySelectorAll('.card').length) {
+        document.getElementById("result").innerText = "🎉 Молодец! Все картинки найдены!";
+        document.getElementById("restart").style.display = "block";
+      }
+    } else {
+      first.classList.add('wrong');
+      second.classList.add('wrong');
+      setTimeout(() => {
+        first.classList.remove('wrong');
+        second.classList.remove('wrong');
+        first.style.transform = "scale(1)";
+        second.style.transform = "scale(1)";
+        selected = [];
+      }, 700);
+    }
+  }
+}
+
+document.getElementById("restart").addEventListener("click", createGame);
+createGame();
+</script>
+
+</body>
+</html>
